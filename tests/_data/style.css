@@ -1,0 +1,226 @@
+:root {
+    --main-color: #3498db;
+    --accent-color: #e74c3c;
+}
+
+/* Импорт CSS файла из той же директории */
+@import url("base.css");
+
+/* Импорт CSS файла с использованием условия медиа-запроса */
+@import url("print.css") print;
+
+/* Импорт веб-шрифта */
+@import url("https://fonts.googleapis.com/css?family=Open+Sans");
+
+/* Подключение локального шрифта */
+@font-face {
+    font-family: "MyHelvetica";
+    src: local("Helvetica Neue Bold"),
+    local("HelveticaNeue-Bold"),
+    url("HelveticaNeue-Bold.woff2") format("woff2"),
+    url("HelveticaNeue-Bold.woff") format("woff");
+    font-weight: bold;
+}
+
+/* Использование подключенного шрифта в стилях */
+.body-text {
+    font-family: "MyHelvetica", Arial, sans-serif;
+}
+
+/* Глобальные стили */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 5px 5px 5px 5px;
+    padding: 10px 3px 1px;
+    background: var(--light-gray, #f4f4f4);
+}
+
+.container {
+    --container-background: #f3f3f3;
+}
+
+.container p {
+    background: var(--container-background);  /* Используется только внутри .container */
+}
+
+/* Класс */
+.header{
+    background-color: #333;
+    color: white;
+    text-align: center;
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.content {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: 20px;
+    padding: 20px;
+}
+
+/* Адаптивность */
+@media (max-width: 768px) {
+    .content {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Идентификатор */
+#main-article {
+    padding: 20px;
+    background-color: white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.sidebar {
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    background: #eee;
+}
+
+.sidebar ul {
+    list-style: none;
+    padding: 0;
+}
+
+.sidebar li {
+    margin-bottom: 10px;
+}
+
+/* Ссылки с псевдоклассами */
+a {
+    color: #06c;
+    text-decoration: none;
+}
+
+a:hover, a:active {
+    text-decoration: underline;
+}
+
+.footer {
+    text-align: center;
+    padding: 10px 0;
+    background-color: #333;
+    color: white;
+    position: relative;
+}
+
+/* Стилизация всех <div> элементов */
+div {
+    background-color: lightgray;
+    padding: 20px;
+    margin-bottom: 10px;
+}
+
+/* Стилизация всех <p> элементов */
+p {
+    font-size: 16px;
+    line-height: 1.5;
+    color: navy;
+}
+
+/* Стилизация всех <a> элементов */
+a {
+    color: blue;
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
+.menu {
+    background-color: #333;
+    color: white;
+    padding: 10px;
+    list-style: none;
+}
+
+.menu li {
+    display: inline;
+    margin-right: 10px;
+}
+
+.header {
+    background-color: #0066cc;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+#logo {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+#footer {
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Аттрибуты */
+input[type="text"] {
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 200px;
+}
+
+a[href^="http"] {
+    color: green;
+}
+
+a[href*="example.com"] {
+    font-weight: bold;
+}
+
+/* Анимации */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+.header h1 {
+    animation: fadeIn 2s ease-in-out;
+}
+
+/* Применение стилей для экранов с максимальной шириной 768px */
+@media (max-width: 768px) {
+    body {
+        background-color: lightblue;
+    }
+    .container {
+        padding: 20px;
+    }
+}
+
+/* Применение стилей для печати */
+@media print {
+    body {
+        color: black;
+        background: white;
+    }
+    .navbar, .footer {
+        display: none;
+    }
+}
+
+/* Анимация fadeIn, которая изменяет прозрачность элемента */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+/* Применение анимации fadeIn к элементам с классом .fade-in */
+.fade-in {
+    animation: fadeIn 3s ease-in-out;
+}
