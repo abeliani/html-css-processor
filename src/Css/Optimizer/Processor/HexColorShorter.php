@@ -18,7 +18,7 @@ use Abeliani\CssJsHtmlOptimizer\Common\ProcessorInterface;
 class HexColorShorter implements ProcessorInterface
 {
     private const COLOR_PATTERN = '#%s%s%s';
-    private const HEX_COLOR_PATTERN = '/#(?:[a-f0-9]{6})/i';
+    private const HEX_COLOR_PATTERN = '~#[a-f0-9]{6}~i';
 
     /**
      * #ffffff to #fff
