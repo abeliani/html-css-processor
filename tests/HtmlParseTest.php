@@ -32,7 +32,8 @@ class HtmlParseTest extends Unit
     public function testCompress(): void
     {
         $document = new Html\Parser\Document(
-                '<section>
+                '<!-- comment -->
+                <section>
                     <h2>Main content</h2> <p>bla bla bla.</p>
                 </section>'
         );
