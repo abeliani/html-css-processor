@@ -31,6 +31,7 @@ class HtmlOptimizeTest extends Unit
 
     public function testRemoveUnnecessary(): void
     {
+        /** @noinspection HtmlDeprecatedAttribute */
         $document = new Html\Parser\Document('
                 <style type="text/css">body { margin: 0; }</style>
                 <script type="text/javascript">alert("Hi!")</script>
