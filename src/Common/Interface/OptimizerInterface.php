@@ -9,18 +9,11 @@
  * @link        https://github.com/abeliani/css-js-html-optimizer
  */
 
-namespace Abeliani\CssJsHtmlOptimizer\Css\Parser;
+namespace Abeliani\CssJsHtmlOptimizer\Common\Interface;
 
-use Abeliani\CssJsHtmlOptimizer\Css\Block\BlockInterface;
-
-interface ParserInterface
+interface OptimizerInterface
 {
-    /**
-     * @return BlockInterface[]
-     */
-    public function parse(): array;
+    public function do(): OptimizerInterface;
 
-    public function getRaw(): string;
-
-    public function clear(): void;
+    public function flush(?RenderInterface $render = null): string;
 }

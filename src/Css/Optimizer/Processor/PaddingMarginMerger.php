@@ -13,12 +13,14 @@ declare(strict_types=1);
 
 namespace Abeliani\CssJsHtmlOptimizer\Css\Optimizer\Processor;
 
+use Abeliani\CssJsHtmlOptimizer\Common\ProcessorInterface;
+
 class PaddingMarginMerger implements ProcessorInterface
 {
     private const MARGIN = 'margin:';
     private const PADDING = 'padding:';
 
-    public function __invoke(string &$command, string &$property): void
+    public function __invoke(string &$property): void
     {
         if (str_starts_with($property, self::MARGIN) || str_starts_with($property, self::PADDING)) {
             [$name, $stmt] = explode(':', $property);

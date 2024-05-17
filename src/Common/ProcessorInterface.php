@@ -9,9 +9,9 @@
  * @link        https://github.com/abeliani/css-js-html-optimizer
  */
 
-namespace Abeliani\CssJsHtmlOptimizer\Css\Optimizer\Processor;
+namespace Abeliani\CssJsHtmlOptimizer\Common;
 
 interface ProcessorInterface
 {
-    public function __invoke(string &$command, string &$property): void;
+    public function __invoke(string &$property): void;
 }

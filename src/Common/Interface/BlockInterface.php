@@ -9,13 +9,16 @@
  * @link        https://github.com/abeliani/css-js-html-optimizer
  */
 
-namespace Abeliani\CssJsHtmlOptimizer\Css\Optimizer;
+namespace Abeliani\CssJsHtmlOptimizer\Common\Interface;
 
-use Abeliani\CssJsHtmlOptimizer\Css\Render\RenderInterface;
-
-interface OptimizerInterface
+interface BlockInterface extends \Stringable
 {
-    public function do(): OptimizerInterface;
+    /**
+     * @return BlockInterface[]
+     */
+    public function getProperties(): array;
 
-    public function flush(?RenderInterface $render = null): string;
+    public function getCommand(): string;
+
+    public function __toString(): string;
 }

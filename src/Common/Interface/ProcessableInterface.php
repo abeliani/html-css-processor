@@ -9,20 +9,11 @@
  * @link        https://github.com/abeliani/css-js-html-optimizer
  */
 
-namespace Abeliani\CssJsHtmlOptimizer\Css\Block;
+namespace Abeliani\CssJsHtmlOptimizer\Common\Interface;
 
-use Abeliani\CssJsHtmlOptimizer\Css\Optimizer\Processor\ProcessorInterface;
+use Abeliani\CssJsHtmlOptimizer\Common\ProcessorInterface;
 
-interface BlockInterface extends \Stringable
+interface ProcessableInterface
 {
-    /**
-     * @return array|BlockInterface[]
-     */
-    public function getProperties(): array;
-
-    public function getCommand(): string;
-
     public function optimize(ProcessorInterface ...$optimizers): void;
-
-    public function __toString(): string;
 }

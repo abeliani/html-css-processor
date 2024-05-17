@@ -13,18 +13,32 @@ declare(strict_types=1);
 
 namespace Abeliani\CssJsHtmlOptimizer\Tests;
 
+use Abeliani\CssJsHtmlOptimizer\Common\Interface\BlockInterface;
 use Abeliani\CssJsHtmlOptimizer\Css;
-use Abeliani\CssJsHtmlOptimizer\Css\Block\BlockInterface;
 use Abeliani\CssJsHtmlOptimizer\Css\Block\Rule;
 use Codeception\Test\Unit;
 
 class CssParserTest extends Unit
 {
+    public function testWrongCode(): void
+    {
+        $document = new Css\Parser\Document('     
+                     / \__
+                    (    @\____
+                     /         O
+                    /   (_____/
+                   /_____/
+        ');
+
+        $this->assertEmpty($document->parse());
+    }
+
     public function testCollectObjects(): void
     {
         $document = new Css\Parser\Document("body{font-family: 'Arial', sans-serif;}");
 
         $this->assertIsArray($document->parse());
+        $this->assertNotEmpty($document->parse());
         $this->assertContainsOnlyInstancesOf(Rule::class, $document->parse());
         $this->assertContainsOnlyInstancesOf(BlockInterface::class, $document->parse());
     }

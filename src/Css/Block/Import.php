@@ -13,7 +13,7 @@ declare(strict_types=1);
 
 namespace Abeliani\CssJsHtmlOptimizer\Css\Block;
 
-final class Import extends Block
+final class Import extends CssBlock
 {
     public function __toString(): string
     {

@@ -13,37 +13,34 @@ declare(strict_types=1);
 
 namespace Abeliani\CssJsHtmlOptimizer\Css\Optimizer;
 
+use Abeliani\CssJsHtmlOptimizer\Common\Interface\RenderInterface;
+use Abeliani\CssJsHtmlOptimizer\Common\OptimizerAbstract;
+use Abeliani\CssJsHtmlOptimizer\Css\Block\Import;
+use Abeliani\CssJsHtmlOptimizer\Css\Block\Rule;
 use Abeliani\CssJsHtmlOptimizer\Css\Optimizer\Processor\HexColorShorter;
 use Abeliani\CssJsHtmlOptimizer\Css\Optimizer\Processor\PaddingMarginMerger;
 use Abeliani\CssJsHtmlOptimizer\Css\Parser\Document;
-use Abeliani\CssJsHtmlOptimizer\Css\Render\RenderInterface;
 
-class Optimizer implements OptimizerInterface
+class Optimizer extends OptimizerAbstract
 {
-    private array $optimizer;
-
-    /**
-     * @var resource|false
-     */
-    private mixed $resource;
-
-    public function __construct(private readonly Document $document)
+    public function __construct(Document|array $documents, ?array $optimizers = null)
     {
-        if (!$this->resource = tmpfile()) {
-            throw new \Exception('Failed to create tmp file');
-        }
-
-        $this->optimizer = [
+        $set = $optimizers === null ? [
             new PaddingMarginMerger,
             new HexColorShorter,
-        ];
+        ] : $optimizers;
+
+        parent::__construct($documents, $set);
     }
 
     public function do(): self
     {
-        foreach ($this->document->parse() as $element) {
-            $element->optimize(...$this->optimizer);
-            fwrite($this->resource, sprintf('%s', $element));
+        foreach ($this->documents as $document) {
+            /** @var $element Rule|Import */
+            foreach ($document->parse() as $element) {
+                $element->optimize(...$this->optimizers);
+                fwrite($this->resource, sprintf('%s', $element));
+            }
         }
 
         return $this;

@@ -9,7 +9,7 @@
  * @link        https://github.com/abeliani/css-js-html-optimizer
  */
 
-namespace Abeliani\CssJsHtmlOptimizer\Css\Render;
+namespace Abeliani\CssJsHtmlOptimizer\Common\Interface;
 
 interface RenderInterface
 {

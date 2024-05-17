@@ -11,12 +11,21 @@
 
 declare(strict_types=1);
 
-namespace Abeliani\CssJsHtmlOptimizer\Css\Block;
+namespace Abeliani\CssJsHtmlOptimizer\Common;
 
-class Rule extends CssBlock
+abstract class DocumentAbstract
 {
-    public function __toString(): string
+    protected ?string $data;
+
+    public function getRaw(): string
     {
-        return sprintf('%s{%s}', $this->command, implode(';', $this->properties));
+        return $this->data ?? '';
     }
+
+    public function clear(): void
+    {
+        $this->data = null;
+    }
+
+    abstract public function parse(): array|string;
 }
