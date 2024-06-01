@@ -1,0 +1,33 @@
+{
+    "name": "abeliani/css-js-html-optimizer",
+    "description": "Fast merging, minimization and optimization of css, javascript and html code",
+    "type": "library",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Abeliani\\CssJsHtmlOptimizer\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Abeliani\\CssJsHtmlOptimizer\\Tests\\": "tests/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Anatolii Belianin",
+            "email": "belianianatoli@gmail.com",
+            "homepage": "https://treecode.ru"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "php": "^8.1",
+        "ext-dom": "*",
+        "ext-libxml": "*"
+    },
+    "require-dev": {
+        "codeception/codeception": "^4.1",
+        "codeception/module-asserts": "^2.0"
+    }
+}
