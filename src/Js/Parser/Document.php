@@ -22,11 +22,11 @@ final class Document extends DocumentAbstract
 
     public function __construct(string $js)
     {
-        $this->data = $this->prepare($js);
+        parent::__construct($this->prepare($js), ';');
     }
 
     public function parse(): string
     {
-        return $this->data;
+        return $this->getRaw();
     }
 }

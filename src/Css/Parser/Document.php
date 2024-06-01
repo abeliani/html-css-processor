@@ -32,7 +32,7 @@ class Document extends DocumentAbstract
     public function __construct(string $css)
     {
         $this->proto = new Element;
-        $this->data = $this->prepare($css);
+        parent::__construct($this->prepare($css));
     }
 
     public function parse(): array

@@ -22,11 +22,11 @@ class Document extends DocumentAbstract
 
     public function __construct(string $html)
     {
-        $this->data = $this->prepare($html);
+        parent::__construct($this->prepare($html));
     }
 
     public function parse(): string
     {
-        return $this->data;
+        return $this->getRaw();
     }
 }

@@ -53,13 +53,19 @@ abstract class OptimizerAbstract implements OptimizerInterface
      */
     public function do(): self
     {
-        foreach ($this->documents as $document) {
+        for ($i = 0; $i < count($this->documents); $i++) {
+            $document = $this->documents[$i];
             $data = $document->parse();
+
             foreach ($this->optimizers as $optimizer) {
                 $optimizer($data);
             }
 
             fwrite($this->resource, $data);
+
+            if (isset($this->documents[$i + 1])) {
+                fwrite($this->resource, $document->getDivider());
+            }
         }
 
         return $this;

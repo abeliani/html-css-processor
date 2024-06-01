@@ -15,7 +15,13 @@ namespace Abeliani\CssJsHtmlOptimizer\Common;
 
 abstract class DocumentAbstract
 {
-    protected ?string $data;
+    /**
+     * @param string|null $data
+     * @param string $divider
+     */
+    public function __construct(protected ?string $data, private string $divider = '')
+    {
+    }
 
     public function getRaw(): string
     {
@@ -25,6 +31,11 @@ abstract class DocumentAbstract
     public function clear(): void
     {
         $this->data = null;
+    }
+
+    public function getDivider(): string
+    {
+        return $this->divider;
     }
 
     abstract public function parse(): array|string;
