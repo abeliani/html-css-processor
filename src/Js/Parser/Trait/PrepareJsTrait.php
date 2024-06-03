@@ -15,6 +15,8 @@ namespace Abeliani\CssJsHtmlOptimizer\Js\Parser\Trait;
 
 trait PrepareJsTrait
 {
+    use ClearCommentTrait;
+
     protected function prepare(string $data): string
     {
         $data = $this->clearSpaces($this->clearComments($data));
@@ -33,12 +35,11 @@ trait PrepareJsTrait
 
     private function clearSpaces(string $data): string
     {
-        return preg_replace(['~\s+~', '~\s*([{}();])\s*~', '~\s*(===|==|=|\*|-|\|\|)\s*~'], [' ', '$1', '$1'], $data);
-    }
+        $spacesAround = '~\s*([{}();])\s*~';
+        $rnIfNoBrakes = '~(?<![{}\r\n ])(\r?\n *)(?![{}\r\n ])~';
+        $spacesAroundOperators ='~\s*(===|==|=|\*|-|\|\||/|%)\s*~';
 
-    private function clearComments(string $data): string
-    {
-        return trim(preg_replace('~/\*[\s\S]*?\*/|([^:]|^)//.*$~', '', $data));
+        return preg_replace([$rnIfNoBrakes, $spacesAround, $spacesAroundOperators], ['$1;', '$1', '$1'], $data);
     }
 
     private function hasNoCode(string $data): bool

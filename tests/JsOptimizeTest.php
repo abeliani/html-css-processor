@@ -58,6 +58,18 @@ class JsOptimizeTest extends Unit
         $this->assertStringNotContainsString('o_1', $optimized);
     }
 
+    public function testCarefulRemoveWhiteSpaces(): void
+    {
+        $document = new Js\Parser\Document(
+            'image = list[i]
+             fixSize = (image.size / 1000).toFixed(1) * 1'
+        );
+        $optimizer = new Js\Optimizer\Optimizer($document);
+
+        $optimized = $optimizer->do()->flush();
+        $this->assertEquals('image=list[i];fixSize=(image.size/1000).toFixed(1)*1', $optimized);
+    }
+
     public function testManyRenamed(): void
     {
         $document = new Js\Parser\Document($this->js);
