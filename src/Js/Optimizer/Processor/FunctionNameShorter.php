@@ -19,7 +19,7 @@ class FunctionNameShorter implements ProcessorInterface
 {
     private const PATTERNS = ['o', 'q', 'u', 'e', 'l', 'i'];
     private const LAST_PATTERN = 'php';
-    private const FUNCTION_PATTERN = '~function\s+(\w{3,}\s*\()~';
+    private const FUNCTION_PATTERN = '~function\s+(\w{3,}\s*)~';
 
     private array $renamed = [];
     private array $replacedNames = [];
@@ -55,19 +55,26 @@ class FunctionNameShorter implements ProcessorInterface
 
     private function renameFunctionDetermine(string &$property): void
     {
-        $property = preg_replace_callback(self::FUNCTION_PATTERN, function (array $m) {
+        $property = preg_replace_callback(self::FUNCTION_PATTERN, function (array $m) use ($property) {
             [$fn, $original] = explode(' ', $m[0]);
-            $shortName = array_shift($this->replacedNames);
+
+            // we cannot replace a function name if we are sure the name is used only to call the function
+            if (preg_match(sprintf('~\b%s\b(?!\(|\.)~', $original), $property)) {
+                return $m[0];
+            }
+
+            $tmpl = array_shift($this->replacedNames);
+            $shortName = ctype_upper($original[0]) ? ucfirst($tmpl) : $tmpl;
             $this->renamed[$original] = $shortName;
 
-            return sprintf('%s %s(', $fn, $shortName);
+            return sprintf('%s %s', $fn, $shortName);
         }, $property);
     }
 
     private function renameFunctionCall(string &$property): void
     {
-        $pattern = '~(?<!function\s)%s~i';
-        $renamed = '%s(';
+        $pattern = '~(?<!function\s)\b%s\b(\.|\()~i';
+        $renamed = '%s$1';
 
         foreach ($this->renamed as $old => $new) {
             $property = preg_replace(

@@ -98,6 +98,21 @@ class JsOptimizeTest extends Unit
         $this->assertStringContainsString('u_2(', $optimized);
         $this->assertStringNotContainsString('o_1(', $optimized);
         $this->assertStringNotContainsString('q_1(', $optimized);
-        $this->assertEquals('function u_1(n){console.log(123)}function u_2(){u_1(5)}', $optimized);
+        $this->assertEquals('function u_1(n){console.log(123)};function u_2(){u_1(5)}', $optimized);
+    }
+
+    public function testFirstLetterRenamed(): void
+    {
+        $document = new Js\Parser\Document(
+            'function Test (n) { console.log(123) }
+            function best() {O_1(5);};'
+        );
+
+        $optimizer = new Js\Optimizer\Optimizer($document);
+        $optimized = $optimizer->do()->flush();
+
+        $this->assertStringContainsString('O_1(', $optimized);
+        $this->assertStringContainsString('o_2(', $optimized);
+        $this->assertEquals('function O_1(n){console.log(123)};function o_2(){O_1(5)}', $optimized);
     }
 }
