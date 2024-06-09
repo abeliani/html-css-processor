@@ -115,4 +115,36 @@ class JsOptimizeTest extends Unit
         $this->assertStringContainsString('o_2(', $optimized);
         $this->assertEquals('function O_1(n){console.log(123)};function o_2(){O_1(5)}', $optimized);
     }
+
+    public function testWhiteSpaceRemove(): void
+    {
+        $document = new Js\Parser\Document(
+            'window.test = (function(){
+                    return  window.test       ||
+                        function (cb) {
+                            window.setTimeout(cb, 100 / 6);
+                        };
+            })();'
+        );
+
+        $optimizer = new Js\Optimizer\Optimizer($document);
+        $optimized = $optimizer->do()->flush();
+
+        $expected = 'window.test=(function(){return window.test||function(cb){window.setTimeout(cb,100/6)}})()';
+        $this->assertEquals($expected, $optimized);
+    }
+
+    public function testNewLineWhenNextThis(): void
+    {
+        $document = new Js\Parser\Document(
+            'this.util().extend(options, this.defaults)
+                this.config'
+        );
+
+        $optimizer = new Js\Optimizer\Optimizer($document);
+        $optimized = $optimizer->do()->flush();
+
+        $expected = "this.util().extend(options,this.defaults)\nthis.config";
+        $this->assertEquals($expected, $optimized);
+    }
 }

@@ -59,4 +59,19 @@ class JsParserTest extends Unit
         $stmt = '(function($){$(document).ready(function(){$(".button").click(function(){alert("done!")})})})(jQuery)';
         $this->assertEquals($stmt, $document->parse());
     }
+
+    public function testInQuotesNotProcessing(): void
+    {
+        $result = "innerHTML='<a href\"localhost\">Safe    text<\a>'";
+
+        $document = new Js\Parser\Document("innerHTML = '<a href\"localhost\">Safe    text<\a>';");
+        $this->assertEquals($result, $document->parse());
+
+        $document = new Js\Parser\Document('innerHTML = \'<a href"localhost">Safe    text<\a>\';');
+        $this->assertEquals($result, $document->parse());
+
+        $backQuotes = 'console.log(`The sum of ${a} and ${b} is ${a + b}.`)';
+        $document = new Js\Parser\Document($backQuotes);
+        $this->assertEquals($backQuotes, $document->parse());
+    }
 }
