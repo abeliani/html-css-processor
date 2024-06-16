@@ -6,7 +6,7 @@
  * @package     CssJsHtmlOptimizer
  * @author      Anatolii Belianin <belianianatoli@gmail.com>
  * @license     See LICENSE.md for license information
- * @link        https://github.com/abeliani/css-js-html-optimizer
+ * @link        https://github.com/abeliani/css-html-optimizer
  */
 
 declare(strict_types=1);
@@ -15,11 +15,8 @@ namespace Abeliani\CssJsHtmlOptimizer\Js\Parser\Trait;
 
 trait PrepareJsTrait
 {
-    use ClearCommentTrait;
-
     protected function prepare(string $data): string
     {
-        $data = $this->clearComments($data);
         $data = trim($data, " \n\r\t\v\0;");
         return $this->hasNoCode($data) ? '' : $data;
     }

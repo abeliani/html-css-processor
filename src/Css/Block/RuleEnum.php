@@ -6,7 +6,7 @@
  * @package     CssJsHtmlOptimizer
  * @author      Anatolii Belianin <belianianatoli@gmail.com>
  * @license     See LICENSE.md for license information
- * @link        https://github.com/abeliani/css-js-html-optimizer
+ * @link        https://github.com/abeliani/css-html-optimizer
  */
 
 namespace Abeliani\CssJsHtmlOptimizer\Css\Block;
