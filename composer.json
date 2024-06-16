@@ -1,6 +1,6 @@
 {
-    "name": "abeliani/css-js-html-optimizer",
-    "description": "Fast merging, minimization and optimization of css, javascript and html code",
+    "name": "abeliani/html-css-processor",
+    "description": "Fast merging js+css+html, minimization and optimization of css, html code",
     "type": "library",
     "license": "MIT",
     "autoload": {
