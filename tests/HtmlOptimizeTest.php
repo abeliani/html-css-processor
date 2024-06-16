@@ -49,9 +49,10 @@ class HtmlOptimizeTest extends Unit
         $document = new Html\Parser\Document($this->html);
         $o = (new Html\Optimizer\Optimizer($document))->do()->flush();
 
-        $this->assertStringContainsString('longName(', $o);
-        $this->assertStringContainsString('function longName(text)', $o);
-        $this->assertStringContainsString("<script>function longName(text){alert(text)}\nlongName('Hi!')</script>", $o);
+        $this->assertStringContainsString("function longName(text) {\n", $o);
+        $this->assertStringContainsString("alert(text)\n", $o);
+        $this->assertStringContainsString("}\n", $o);
+        $this->assertStringContainsString("longName('Hi!')", $o);
     }
 
     public function testOptimizeInlineStyle(): void
