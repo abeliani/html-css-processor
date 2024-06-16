@@ -13,6 +13,8 @@ declare(strict_types=1);
 
 namespace Abeliani\CssJsHtmlOptimizer\Js\Parser\Trait;
 
+use Abeliani\CssJsHtmlOptimizer\Js\Parser\JSToken;
+
 trait PrepareJsTrait
 {
     use ClearCommentTrait;
@@ -20,43 +22,55 @@ trait PrepareJsTrait
     protected function prepare(string $data): string
     {
         $data = $this->clearSpaces($this->clearComments($data));
-        return $this->hasNoCode($data) ? '' : $data;
+        $data = rtrim($data, JSToken::SEMICOLON);
+        return $this->hasNoCode($data) ? JSToken::NS : $data;
     }
 
     private function clearSpaces(string $data): string
     {
-        $operators = ['/', '*', '=', '|', '-', '+', '<', '>', '!', '~'];
         $length = strlen($data);
-        $apostrophe = 0;
-        $singleQuote = 0;
-        $doubleQuote = 0;
+        $apostrophe = $singleQuote = $doubleQuote = 0;
+        $operators = ['/', '*', '=', '|', '-', '+', '<', '>', '!', '~'];
 
         ob_start();
-        for ($i = 0; ; $i++) {
-            if ($i >= $length) {
-                break;
-            }
+        for ($i = 0; $length > $i; $i++) {
             $curr = $data[$i];
-            $next = $data[$i + 1] ?? '';
-            $prev = $data[$i - 1] ?? '';
+            $next = $data[$i + 1] ?? JSToken::NS;
+            $prev = $data[$i - 1] ?? JSToken::NS;
 
+            if ($curr === JSToken::F_SLASH) {
+                try {
+                    if (!$regexpClose = strpos($data, JSToken::F_SLASH, $i + 1)) {
+                        print $curr;
+                        continue;
+                    }
+                    $regexp = substr($data, $i, $regexpClose - $i + 1);
+                    preg_match($regexp, JSToken::NS);
+
+                    $i = $regexpClose;
+                    print $regexp;
+                    continue;
+                } catch (\Exception) {
+                    continue;
+                }
+            }
             // content inside quotes is not processing
-            if ($prev !== '\\') {
-                if ($curr === '`') {
+            if ($prev !== JSToken::B_SLASH) {
+                if ($curr === JSToken::B_QUOTE) {
                     if ($apostrophe) {
                         $apostrophe--;
                     } else {
                         $apostrophe++;
                     }
                 }
-                if ($curr === "'") {
+                if ($curr === JSToken::QUOTE) {
                     if ($singleQuote) {
                         $singleQuote--;
                     } else {
                         $singleQuote++;
                     }
                 }
-                if ($curr === '"') {
+                if ($curr === JSToken::D_QUOTE) {
                     if ($doubleQuote) {
                         $doubleQuote--;
                     } else {
@@ -68,78 +82,149 @@ trait PrepareJsTrait
                 print $curr;
                 continue;
             }
-            if ($curr === ' ') {
-                [$char, $offset] = $this->firstCharAfterSpaces($data, $i);
-                if (in_array($char, $operators)) {
-                    $i = $offset;
-                    continue;
-                }
-                if ($prev === ' ' || $prev === ',') {
-                    continue;
-                }
-                if (preg_match('~[^a-z]~i', $prev)) {
-                    continue;
-                }
-                if ($next === '(' || $next === ')' || $next === '{') {
-                    continue;
-                }
+
+            if ($curr === JSToken::S) {
+                continue;
             }
-            if (in_array($curr, $operators) && preg_match('~\s~', $next)) {
-                $pair = $this->firstCharAfterSpaces($data, $i);
-                $i = $pair[1];
+
+            if ($curr === JSToken::O_CUR_BRACKET && ($next === JSToken::RL || $next === JSToken::NL)) {
+                $i++;
                 print $curr;
                 continue;
             }
 
-            if ($curr === "\r" || $curr === "\n") {
+            if ($curr === JSToken::SEMICOLON) {
                 [$char, $offset] = $this->firstCharAfterSpaces($data, $i);
-                if ($char === 't' && (substr($data, $offset + 1, 4) === 'this')) {
-                    if ($this->firstCharBeforeSpaces($data, $i) === ')') {
-                        $i = $offset;
-                        print $curr;
-                    }
+
+                if (!$char) {
+                    break;
                 }
+
+                if ($char === JSToken::C_CUR_BRACKET) {
+                    $i = $offset;
+                    print $char;
+                    continue;
+                }
+
+                $i = $offset - 1;
+                print $curr;
                 continue;
             }
 
-            if ($next === "\r" || $next === "\n") {
-                if ($curr === ' ') {
+            if ($curr === JSToken::RL || $curr === JSToken::NL) {
+                if ($prev === JSToken::COMMA
+                    || $prev === JSToken::O_CUR_BRACKET
+                    || $prev === JSToken::SEMICOLON
+                    || in_array($prev, $operators)
+                ) {
                     continue;
                 }
-                if (preg_match('~[a-z0-9\]]~i', $curr)) {
-                    [$char, $offset] = $this->firstCharAfterSpaces($data, $i);
-
-                    if ($char === '}' || $char === ')' || $char === ']') {
-                        $i = $offset + 1;
-                        print sprintf('%s%s', $curr, $char);
-                    } else {
-                        print sprintf('%s;', $curr);
-                    }
-
+                if ($next === JSToken::C_CUR_BRACKET || in_array($next, $operators)) {
                     continue;
                 }
-                if ($curr === '}') {
-                    [$char, $offset] = $this->firstCharAfterSpaces($data, $i);
 
-                    if ($char === 'f' && (substr($data, $offset + 1, 8)) === 'function') {
-                        print sprintf('%s;', $curr);
-                        continue;
-                    }
+                [$char, $i] = $this->firstCharAfterSpaces($data, $i);
+
+                if ($char === JSToken::C_CUR_BRACKET) {
+                    print $char;
+                    continue;
+                }
+
+                if (($prev === JSToken::C_CUBE_BRACKET && $char === JSToken::C_CUBE_BRACKET)
+                    || in_array($char, $operators)
+                ) {
+                    print $char;
+                    continue;
+                }
+
+                print $curr;
+                $curr = $char;
+            }
+
+            if ($curr === JSToken::F
+                && ((substr($data, $i, 9)) === JSToken::WITH_SPACE_FUNCTION
+                    || (substr($data, $i, 9)) === JSToken::WITH_BRACKET_FUNCTION)
+            ) {
+                $openBrakePos = strpos($data, JSToken::O_PARENTHESES, $i);
+                $funcDeclareStmt = preg_replace(
+                    JSToken::PATT_D_SPACES,
+                    JSToken::S,
+                    substr($data, $i, $openBrakePos - $i)
+                );
+
+                $i = $openBrakePos;
+                print sprintf(JSToken::S_PATT_CONCAT, trim($funcDeclareStmt), JSToken::O_PARENTHESES);
+                continue;
+            }
+
+            if ($curr === JSToken::V || $curr === JSToken::L) {
+                $name = trim(substr($data, $i, 4));
+
+                if ($name === JSToken::VAR || $name === JSToken::LET) {
+                    $equalPos = strpos($data, JSToken::EQUAL, $i);
+                    $varStmt = preg_replace(
+                        JSToken::PATT_SPACES,
+                        JSToken::S,
+                        substr($data, $i, $equalPos - $i)
+                    );
+
+                    $i = $equalPos;
+                    print sprintf(JSToken::S_PATT_EQUALS, trim($varStmt));
+                    continue;
                 }
             }
 
-            if ($curr === ';') {
-                if (!$next) {
-                    break;
-                }
-                if ($nextBrakes = strpos($data, '}', $i)) {
-                    if (!trim(substr($data, $i + 1, $nextBrakes - ($i + 1)))) {
-                       $i = $nextBrakes;
-                        print '}';
-                        continue;
-                    }
+            if ($curr === JSToken::C) {
+                $name = trim(substr($data, $i, 5));
+
+                if ($name === JSToken::CONST) {
+                    $equalPos = strpos($data, JSToken::EQUAL, $i);
+                    $constStmt = preg_replace(
+                        JSToken::PATT_SPACES,
+                        JSToken::S,
+                        substr($data, $i, $equalPos - $i)
+                    );
+
+                    $i = $equalPos;
+                    print sprintf(JSToken::S_PATT_EQUALS, trim($constStmt));
+                    continue;
                 }
             }
+
+            if ($curr === JSToken::R && (substr($data, $i, 7)) === JSToken::WITH_SPACE_RETURN) {
+                $pair = $this->firstCharAfterSpaces($data, $i + 6);
+
+                $i = $pair[1] - 1;
+                print JSToken::WITH_SPACE_RETURN;
+                continue;
+            }
+
+            if ($curr === JSToken::E) {
+                $stmt = substr($data, $i, 5);
+                if ($stmt === JSToken::WITH_SPACE_ELSE) {
+                    [$char, $offset] = $this->firstCharAfterSpaces($data, $i + 4);
+
+                    if ($char === JSToken::I || $char === JSToken::O_CUR_BRACKET) {
+
+                        print preg_replace(JSToken::PATT_D_SPACES, JSToken::NS, substr($data, $i, $offset - $i));
+                        $i = $offset - 1;
+                    }
+                    continue;
+                }
+            }
+
+            if ($curr === JSToken::I) {
+                $stmt = substr($data, $i, 3);
+                if ($stmt !== JSToken::WITH_SPACE_IF && $stmt !== JSToken::WITH_BRACKET_IF) {
+                    print $curr;
+                    continue;
+                }
+
+                $i = strpos($data, JSToken::O_PARENTHESES, $i) - 1;
+                print JSToken::IF;
+                continue;
+            }
+
             print $curr;
         }
 
@@ -155,17 +240,11 @@ trait PrepareJsTrait
     {
         $result = new \SplFixedArray(2);
 
-        if (preg_match('~\S~', substr($data, $currPos + 1), $m, PREG_OFFSET_CAPTURE)) {
+        if (preg_match(JSToken::PATT_NON_SPACE, substr($data, $currPos + 1), $m, PREG_OFFSET_CAPTURE)) {
             $result[0] = $m[0][0];
-            $result[1] = $currPos + (int) $m[0][1];
+            $result[1] = $currPos + (int) $m[0][1] + 1;
         }
 
         return $result;
-    }
-
-    private function firstCharBeforeSpaces(string $data, int $currPos): string
-    {
-        preg_match('~\S(?=\s*)~', substr($data, $currPos - 1), $m);
-        return $m[0] ?? '';
     }
 }

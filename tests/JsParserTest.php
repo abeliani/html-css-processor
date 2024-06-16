@@ -40,7 +40,7 @@ class JsParserTest extends Unit
             }'
         );
 
-        $stmt = 'function factorial(n){if(n===0||n===1){return 1}return n*factorial(n-1)}';
+        $stmt = "function factorial(n){if(n===0||n===1){return 1}\nreturn n*factorial(n-1)}";
         $this->assertEquals($stmt, $document->parse());
     }
 
