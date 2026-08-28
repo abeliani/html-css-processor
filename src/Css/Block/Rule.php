@@ -17,6 +17,22 @@ class Rule extends CssBlock
 {
     public function __toString(): string
     {
-        return sprintf('%s{%s}', $this->command, implode(';', $this->properties));
+        return sprintf('%s{%s}', $this->command, implode($this->separator(), $this->properties));
+    }
+
+    /**
+     * Nested blocks (@media, @keyframes) hold rules, not declarations:
+     * a ";" between them is a parse error, the browser drops every rule
+     * after the first one. Declarations still need the ";".
+     */
+    private function separator(): string
+    {
+        foreach ($this->properties as $property) {
+            if ($property instanceof CssBlock) {
+                return '';
+            }
+        }
+
+        return ';';
     }
 }

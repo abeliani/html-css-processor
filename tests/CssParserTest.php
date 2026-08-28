@@ -56,7 +56,7 @@ class CssParserTest extends Unit
         $this->assertEquals('from{opacity:0}', $document->parse()[0]->getProperties()[0]);
         $this->assertEquals('to{opacity:1}', $document->parse()[0]->getProperties()[1]);
 
-        $this->assertEquals('@keyframes fadeIn{from{opacity:0};to{opacity:1}}', (string) $document->parse()[0]);
+        $this->assertEquals('@keyframes fadeIn{from{opacity:0}to{opacity:1}}', (string) $document->parse()[0]);
         $this->assertEquals('from{opacity:0}', (string) $document->parse()[0]->getProperties()[0]);
         $this->assertEquals('to{opacity:1}', (string) $document->parse()[0]->getProperties()[1]);
     }
@@ -87,7 +87,7 @@ class CssParserTest extends Unit
         $this->assertEquals('body{color:black;background:white}', (string) $document->parse()[0]->getProperties()[0]);
         $this->assertEquals('.navbar,.footer{display:none}', (string) $document->parse()[0]->getProperties()[1]);
 
-        $expect = '@media print{body{color:black;background:white};.navbar,.footer{display:none}}';
+        $expect = '@media print{body{color:black;background:white}.navbar,.footer{display:none}}';
         $this->assertEquals($expect, (string) $document->parse()[0]);
     }
 
