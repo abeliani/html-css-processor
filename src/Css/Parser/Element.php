@@ -38,9 +38,11 @@ class Element
             $this->protoImport = new Import;
         }
 
+        // An import prelude is one value, not a list of declarations: splitting
+        // it on ";" cut "url('data:text/css;base64,…')" in half.
         return (clone $this->protoImport)
             ->setCommand($selector)
-            ->setProperties($this->extractProps($props));
+            ->setProperties([$props]);
     }
 
     private static function extractProps(string $propsStmt): array

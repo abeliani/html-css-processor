@@ -103,7 +103,7 @@ class CssParserTest extends Unit
         $this->assertEquals('url("base.css")', $document->parse()[0]->getProperties()[0]);
 
         $this->assertEquals('@import', $document->parse()[1]->getCommand());
-        $this->assertEquals('url("print.css")print', $document->parse()[1]->getProperties()[0]);
+        $this->assertEquals('url("print.css") print', $document->parse()[1]->getProperties()[0]);
 
         $this->assertEquals('@import', $document->parse()[2]->getCommand());
         $url = 'url("https://fonts.googleapis.com/css?family=Open+Sans")';
@@ -127,10 +127,13 @@ class CssParserTest extends Unit
         $this->assertEquals('@font-face', $document->parse()[0]->getCommand());
         $this->assertEquals('font-family:"MyHelvetica"', $document->parse()[0]->getProperties()[0]);
 
-        $src = 'src:local("Helvetica Neue Bold"),local("HelveticaNeue-Bold"),url("HelveticaNeue-Bold.woff2")
-        format("woff2"),url("HelveticaNeue-Bold.woff")format("woff")';
+        // The space before format() is required: without it the url and the
+        // keyword merge and the browser drops the whole src declaration.
+        $src = 'src:local("Helvetica Neue Bold"),local("HelveticaNeue-Bold"),'
+             . 'url("HelveticaNeue-Bold.woff2") format("woff2"),'
+             . 'url("HelveticaNeue-Bold.woff") format("woff")';
 
-        $this->assertEquals(str_replace(["\r", "\n", '  '], '', $src), $document->parse()[0]->getProperties()[1]);
+        $this->assertEquals($src, $document->parse()[0]->getProperties()[1]);
         $this->assertEquals('font-weight:bold', $document->parse()[0]->getProperties()[2]);
     }
 

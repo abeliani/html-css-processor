@@ -15,8 +15,13 @@ namespace Abeliani\CssJsHtmlOptimizer\Css\Block;
 
 final class Import extends CssBlock
 {
+    /**
+     * The space after "@import" is not decoration: without it the at-keyword
+     * and the url merge into the single ident "@importurl" and the browser
+     * skips the statement whole.
+     */
     public function __toString(): string
     {
-        return sprintf('%s%s;', $this->command, $this->properties[0]);
+        return sprintf('%s %s;', $this->command, $this->properties[0] ?? '');
     }
 }

@@ -14,6 +14,7 @@ declare(strict_types=1);
 namespace Abeliani\CssJsHtmlOptimizer\Css\Parser;
 
 use Abeliani\CssJsHtmlOptimizer\Common\DocumentAbstract;
+use Abeliani\CssJsHtmlOptimizer\Css\Block\RuleEnum;
 use Abeliani\CssJsHtmlOptimizer\Css\Parser\Trait\CheckerBlockTrait;
 use Abeliani\CssJsHtmlOptimizer\Css\Parser\Trait\PrepareCssTrait;
 
@@ -64,9 +65,19 @@ class Document extends DocumentAbstract
                     break;
                 case self::STARTS_WITH_AT:
                     if ($this->isImport($i)) {
-                        $stmtEnd = strpos($this->data, self::SEMICOLON, $i);
-                        [$import, $param] = explode(' ', substr($this->data, $i, $stmtEnd - $i));
-                        $document[] = $this->proto->createImport($import, $param);
+                        // Everything between "@import" and the ";" is kept as
+                        // one piece. Splitting on the first space used to drop
+                        // whatever came after the url — the media query of
+                        // "@import url(a.css) screen and (min-width:100px)"
+                        // went missing, and the stylesheet started applying
+                        // everywhere.
+                        $stmtEnd = $this->statementEnd($i);
+                        $statement = substr($this->data, $i, $stmtEnd - $i);
+
+                        $document[] = $this->proto->createImport(
+                            RuleEnum::import->value,
+                            trim(substr($statement, strlen(RuleEnum::import->value))),
+                        );
 
                         $i = $stmtEnd;
                         $start = $i + 1;
@@ -111,6 +122,30 @@ class Document extends DocumentAbstract
         }
 
         return $this->document = $document;
+    }
+
+    /**
+     * Offset of the ";" that ends an at-rule statement, skipping over quoted
+     * values: the ";" of "@import url('data:text/css;base64,…')" belongs to
+     * the url, and stopping there truncated the rule.
+     */
+    private function statementEnd(int $from): int
+    {
+        $length = strlen($this->data);
+
+        for ($i = $from; $i < $length; $i++) {
+            if ($this->data[$i] === '"' || $this->data[$i] === "'") {
+                $i = $this->stringEnd($this->data, $i);
+
+                continue;
+            }
+
+            if ($this->data[$i] === self::SEMICOLON) {
+                return $i;
+            }
+        }
+
+        return $length;
     }
 
     public function clear(): void
